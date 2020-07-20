@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib/",
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es6",
+    "moduleResolution": "Node",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "strict": true,
+    "sourceMap": true,
+    "noImplicitThis": false,
+    "types": [
+      "node",
+      "markdown-it",
+      "markdown-it-container",
+      "loader-utils",
+      "write",
+      "memory-fs"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
