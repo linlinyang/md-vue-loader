@@ -1,24 +1,67 @@
 /*
  * @Author: Yang Lin
- * @Description: 简介
- * @Date: 2020-07-09 20:34:35
- * @LastEditTime: 2020-07-20 20:54:31
+ * @Description: loader 入口
+ * @Date: 2020-07-18 10:42:53
+ * @LastEditTime: 2020-07-23 22:27:45
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
-import MarkdownIt = require('markdown-it');
-import loaderUtils = require('loader-utils');
-import config = require('./config');
-import parseVue = require('./parseVue');
-import path = require('path');
-import write = require('write');
-const md = new MarkdownIt({
-    html: true
-});
+import MarkdownIt from 'markdown-it';
+import loaderUtils from 'loader-utils';
+import {
+    loader
+} from 'webpack';
+import colors from './colors';
+import config from './config';
+import write from 'write';
+import path from 'path';
+import { Console } from 'console';
 
-export = function loader(source: string): string{
-    const options = loaderUtils.getOptions(this);
+const convert: loader.Loader = function(source) {
+    if(source instanceof Buffer){
+        return source;
+    }
+
+    const loaderContext: loader.LoaderContext = this;
+    const {
+        resourcePath,
+        resourceQuery
+    } = loaderContext;
+    // 解析请求字符串
+    const queryParams = resourceQuery.length > 0
+        ? loaderUtils.parseQuery(resourceQuery)
+        : {};
+
+    // 请求md文件中vue代码块
+    if (queryParams.fence) {
+        // 请求md文件中的第n个vue代码块，从0开始
+        const index: number = typeof queryParams.componentIndex === 'string'
+            ? Number(queryParams.componentIndex)
+            : 0;
+        // 从md文件中匹配特殊标记的vue代码
+        const matches: null | RegExpMatchArray = source.match(/:::demo[\s\S]*?:::/ig);
+        if (!matches || !matches[index]) {
+            console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块失败。`);
+            return '';
+        }
+
+        const vueBlocks: null | RegExpMatchArray = matches[index].match(/```([\s\S]*?)(<[\s\S]*)```/i);
+        if (vueBlocks && vueBlocks[2]) {
+            return vueBlocks[2];
+        }
+
+        console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块中的vue代码块失败。`);
+        return '';
+    }
+
+    // 初始化markdownit
+    const md: MarkdownIt = new MarkdownIt({
+        html: true
+    });
+    // 设置markdown自定义代码块
     config(md);
-    const code = md.render(source);
+
+    // markdown将md文件转换为预期代码
+    const code: string = md.render(source);
     
     // vue组件标记开标签
     const startTag: string = '<!-- <vue-component-block>';
@@ -33,7 +76,7 @@ export = function loader(source: string): string{
     // 最终输出html内容
     let templateContent: string = '';
     // vue 组件名标志
-    let componentIndex: number = 1;
+    let componentIndex: number = 0;
     // script 引入vue组件
     let srciptImport: string = '';
     // components 属性
@@ -42,18 +85,11 @@ export = function loader(source: string): string{
     while (tagBeginIndex >= 0 && tagEndIndex >= 0) {
         templateContent += code.slice(start, tagBeginIndex);
         // 编译vue组件字符串
-        const vueCode = code.slice(tagBeginIndex + startTag.length, tagEndIndex);
-        const {
-            dir,
-            name
-        } = path.parse(this.resourcePath);
-        const componentName: string = md.utils.escapeHtml(`${name}${componentIndex}`);
-        const fileName = path.join(dir,`${name}`,`${name}${componentIndex++}.vue`);
-        write.sync(fileName, vueCode);
-        srciptImport += `import ${componentName} from '${JSON.stringify(fileName)}';`;
-        templateContent += `<${componentName}></${componentName}>
-        `;
-        components.push(`${componentName}: Function('(${componentName})')()`);
+        const componentName: string =`component${componentIndex}`;
+        const request: string = `${resourcePath}?fence&componentIndex=${componentIndex++}`;
+        srciptImport += `import ${componentName} from ${loaderUtils.stringifyRequest(loaderContext, request)};`;
+        templateContent += `<${componentName}></${componentName}>`;
+        components.push(`${componentName}: ${componentName}`);
         start = tagEndIndex + endTag.length;
         tagBeginIndex = code.indexOf(startTag, start);
         tagEndIndex = code.indexOf(endTag, tagBeginIndex + startTag.length);
@@ -81,5 +117,8 @@ export = function loader(source: string): string{
         </script>
     `;
 
-    return ret;
-}
+    write(path.resolve(__dirname, 'aaa.vue'), ret);
+    return `module.exports = ${ret}`;
+};
+
+export default convert;

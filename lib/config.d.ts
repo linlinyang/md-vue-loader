@@ -1,9 +1,12 @@
-import MarkdownIt = require('markdown-it');
+import MarkdownIt from 'markdown-it';
 interface Option {
     containerName?: string;
     componentWrapperClass?: string;
     descClass?: string;
     highlightClass?: string;
 }
-declare const _default: (md: MarkdownIt, { containerName, componentWrapperClass, descClass, highlightClass }?: Option) => void;
-export = _default;
+interface getName {
+    (): string;
+}
+export default function (md: MarkdownIt, callback: getName, { containerName, componentWrapperClass, descClass, highlightClass }?: Option): void;
+export {};

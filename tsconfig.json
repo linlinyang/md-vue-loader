@@ -16,8 +16,8 @@
       "markdown-it",
       "markdown-it-container",
       "loader-utils",
-      "write",
-      "memory-fs"
+      "webpack",
+      "write"
     ]
   },
   "include": [

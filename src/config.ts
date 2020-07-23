@@ -1,13 +1,13 @@
 /*
  * @Author: Yang Lin
- * @Description: 使用container加载自定义代码块
+ * @Description: 配置markdownit，使用container加载自定义代码块
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-07-16 19:40:23
- * @FilePath: \md-vue-loader\src\config.ts
+ * @LastEditTime: 2020-07-23 22:27:36
+ * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
  */ 
 
-import MarkdownIt = require('markdown-it');
-import container = require('markdown-it-container');
+import MarkdownIt from 'markdown-it';
+import container from 'markdown-it-container';
 import Token = require('markdown-it/lib/token');
 import Renderer = require('markdown-it/lib/renderer');
 
@@ -22,7 +22,7 @@ interface Option {
     highlightClass?: string
 }
 
-export = function(
+export default function(
     md: MarkdownIt,
     {
         containerName = 'demo',
@@ -44,6 +44,7 @@ export = function(
                 const nextToken: Token = tokens[idx + 1];
                 const content: string = nextToken.type === 'fence' ? nextToken.content.trim() : '';
                 
+                console.log(callback(), '------------------------------config');
                 // 特殊标签包裹vue组件代码
                 return `<div class="${componentWrapperClass}">
                     <!-- <vue-component-block>${content}</vue-component-block> --!>
@@ -74,7 +75,7 @@ export = function(
             return `
                 ${description ? `<div class="${descClass}">${md.render(description)}</div>` : ''}\n
                 <div class="${highlightClass}">
-                    <pre><code class="html">${md.utils.escapeHtml(token.content)}</code></pre>
+                    <pre><code class="html" v-pre >${md.utils.escapeHtml(token.content)}</code></pre>
                 </div>\n
             `;
         }

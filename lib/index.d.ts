@@ -1,2 +1,3 @@
-declare const _default: (source: string) => string;
-export = _default;
+import { loader } from 'webpack';
+declare const convert: loader.Loader;
+export default convert;
