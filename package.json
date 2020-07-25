@@ -1,5 +1,5 @@
 {
-  "name": "md-vue-loader",
+  "name": "markdone-vue-loader",
   "version": "1.0.0",
   "description": "load vue component from md files",
   "main": "lib/index.js",

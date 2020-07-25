@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: 简介
  * @Date: 2020-07-18 10:53:13
- * @LastEditTime: 2020-07-25 16:01:55
+ * @LastEditTime: 2020-07-25 16:52:50
  * @FilePath: f:\sourcecode\md-vue-loader\example\APP.vue
 --> 
 
@@ -21,11 +21,6 @@ export default {
     name: 'APP',
     components: {
         ButtonDemo
-    },
-    methods: {
-        onClick() {
-            console.log('点击按钮');
-        }
     },
     mounted(){
         this.$nextTick(() => {

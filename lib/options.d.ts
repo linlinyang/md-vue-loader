@@ -1,5 +1,5 @@
 /**
- * md-vue-loader 转换示例
+ * markdone-vue-loader 转换示例
  *
  * 原始代码：
  * :::${containerName: demo} 一些代码简介
@@ -39,7 +39,7 @@ interface MarkdownItPluginOptions {
     readonly options: any[];
 }
 /**
- * md-vue-loader 参数
+ * markdone-vue-loader 参数
  */
 interface Options {
     /**

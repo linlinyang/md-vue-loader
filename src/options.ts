@@ -2,12 +2,12 @@
  * @Author: Yang Lin
  * @Description: 简介
  * @Date: 2020-07-24 21:15:59
- * @LastEditTime: 2020-07-25 12:03:50
+ * @LastEditTime: 2020-07-25 17:40:53
  * @FilePath: f:\sourcecode\md-vue-loader\src\options.ts
  */ 
 
 /**
- * md-vue-loader 转换示例
+ * markdone-vue-loader 转换示例
  * 
  * 原始代码：
  * :::${containerName: demo} 一些代码简介 
@@ -50,7 +50,7 @@ interface MarkdownItPluginOptions {
 }
 
 /**
- * md-vue-loader 参数
+ * markdone-vue-loader 参数
  */
 interface Options {
     /**
