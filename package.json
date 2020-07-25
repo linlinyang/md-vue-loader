@@ -8,7 +8,8 @@
     "lib"
   ],
   "scripts": {
-    "dev": "tsc && webpack-dev-server --config example/webpack.conf.js --inline"
+    "dev": "tsc && webpack-dev-server --config example/webpack.conf.js --inline",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "Zoro Yang<935704186@qq.com>",

@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-07-25 16:03:02
+ * @LastEditTime: 2020-07-25 16:24:37
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
@@ -12,8 +12,6 @@ import {
 } from 'webpack';
 import colors from './colors';
 import config from './config';
-import write from 'write';
-import path from 'path';
 import uniqid from 'uniqid';
 import Options from './options';
 
