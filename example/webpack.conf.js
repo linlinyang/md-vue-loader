@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: webpack 配置文件
  * @Date: 2020-07-06 20:08:07
- * @LastEditTime: 2020-07-20 20:45:16
+ * @LastEditTime: 2020-07-25 15:29:39
  * @FilePath: f:\sourcecode\md-vue-loader\example\webpack.conf.js
  */ 
 const path = require('path');
@@ -33,17 +33,15 @@ module.exports = {
             use: [{
                 loader: 'vue-loader'
             },{
-                loader: 'md-vue-loader',
-                options: {
-                    aaa: 'bbb'
-                }
+                loader: 'md-vue-loader'
             }]
         },{
             test: /\.(sa|sc|c)ss$/,
             use: [
                 'style-loader',
                 'css-loader',
-                'postcss-loader'
+                'postcss-loader',
+                'sass-loader'
             ]
         }]
     },

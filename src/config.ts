@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: 配置markdownit，使用container加载自定义代码块
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-07-23 22:27:36
+ * @LastEditTime: 2020-07-25 15:20:18
  * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
  */ 
 
@@ -11,25 +11,27 @@ import container from 'markdown-it-container';
 import Token = require('markdown-it/lib/token');
 import Renderer = require('markdown-it/lib/renderer');
 
-interface Option {
-    // vue组件标记代码
-    containerName?: string,
-    // 组件渲染结果包裹类名
-    componentWrapperClass?: string,
-    // 简介渲染结果包裹类名
-    descClass?: string,
-    // 高亮代码渲染结果包裹类名
-    highlightClass?: string
+// 每次生成自定义代码时调用
+// 生成当前md文件中唯一的组件名
+interface UniqComponentName {
+    (): string
 }
 
 export default function(
     md: MarkdownIt,
     {
         containerName = 'demo',
-        componentWrapperClass = 'vue-demo-block',
-        descClass = 'code-desc',
-        highlightClass = 'highlight'
-    }: Option = {}
+        demoWrapperClass = 'vue-demo-block',
+        descClass = 'vue-demo-desc',
+        highlightClass = 'vue-demo-highlight',
+        beforeDemoSlotName = 'beforeVueDemoBlock',
+        afterDemoSlotName = 'afterVueDemoBlock',
+        beforeDescSlotName = 'beforeDescDemoBlock',
+        afterDescSlotName = 'afterDescDemoBlock',
+        beforeCodeSlotName = 'beforeCodeDemoBlock',
+        afterCodeSlotName = 'afterCodeDemoBlock'
+    },
+    getName: UniqComponentName
 ): void {
     const containerReg: RegExp = new RegExp(`^${containerName}\\s+(.*)$`,'i');
     
@@ -40,14 +42,13 @@ export default function(
         render: (tokens: any, idx: number): string => {
             // 开标签
             if (tokens[idx].nesting === 1) {
-                // 包含在特殊标志中的vue组件代码
-                const nextToken: Token = tokens[idx + 1];
-                const content: string = nextToken.type === 'fence' ? nextToken.content.trim() : '';
-                
-                console.log(callback(), '------------------------------config');
-                // 特殊标签包裹vue组件代码
-                return `<div class="${componentWrapperClass}">
-                    <!-- <vue-component-block>${content}</vue-component-block> --!>
+                // 当前md文件中唯一组件名
+                const componentName: string = getName();
+                // 替换:::demo中vue代码为组件
+                return `<div class="${demoWrapperClass}">
+                    <slot name="${beforeDemoSlotName}"></slot>
+                    <${componentName}></${componentName}>
+                    <slot name="${afterDemoSlotName}"></slot>
                 `;
             }else{
                 // 闭标签
@@ -55,6 +56,8 @@ export default function(
             }
         }
     });
+    md.use(container, 'tip');
+    md.use(container, 'warning');
     
     // 默认代码高亮处理
     const defaultFence: Renderer.RenderRule = md.renderer.rules.fence || function(
@@ -62,7 +65,7 @@ export default function(
         idx: number
     ) {
         const token: Token = tokens[idx];
-        return `<pre><code class="language-${token.info}">${md.utils.escapeHtml(token.content)}</code></pre>`;
+        return `<pre v-pre ><code class="language-${token.info}">${md.utils.escapeHtml(token.content)}</code></pre>`;
     };
     // 插入对等的高亮代码块
     md.renderer.rules.fence = function(tokens, idx, options, env, self): string {
@@ -71,11 +74,17 @@ export default function(
         // 处理当前代码是vue组件的代码块
         const isInDemoContainer = prevToken && prevToken.nesting === 1 && prevToken.info.trim().match(/^demo\s*(.*)$/);
         if (isInDemoContainer) {
-            const description = (prevToken.info || '').trim();
+            const description = isInDemoContainer[1].trim();
             return `
-                ${description ? `<div class="${descClass}">${md.render(description)}</div>` : ''}\n
+                ${description ? `<div class="${descClass}">
+                    <slot name="${beforeDescSlotName}"></slot>
+                    ${md.render(description)}
+                    <slot name="${afterDescSlotName}"></slot>
+                </div>` : ''}\n
                 <div class="${highlightClass}">
+                    <slot name="${beforeCodeSlotName}"></slot>
                     <pre><code class="html" v-pre >${md.utils.escapeHtml(token.content)}</code></pre>
+                    <slot name="${afterCodeSlotName}"></slot>
                 </div>\n
             `;
         }

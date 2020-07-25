@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-07-23 22:27:45
+ * @LastEditTime: 2020-07-25 16:03:02
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
@@ -14,7 +14,11 @@ import colors from './colors';
 import config from './config';
 import write from 'write';
 import path from 'path';
-import { Console } from 'console';
+import uniqid from 'uniqid';
+import Options from './options';
+
+// demo中vue代码转换为唯一组件名前缀
+const uniqComponentName: string = `Com${uniqid()}Demo`;
 
 const convert: loader.Loader = function(source) {
     if(source instanceof Buffer){
@@ -30,7 +34,7 @@ const convert: loader.Loader = function(source) {
     const queryParams = resourceQuery.length > 0
         ? loaderUtils.parseQuery(resourceQuery)
         : {};
-
+        
     // 请求md文件中vue代码块
     if (queryParams.fence) {
         // 请求md文件中的第n个vue代码块，从0开始
@@ -52,57 +56,63 @@ const convert: loader.Loader = function(source) {
         console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块中的vue代码块失败。`);
         return '';
     }
-
+    const options: Options = loaderUtils.getOptions(loaderContext);
+    
     // 初始化markdownit
     const md: MarkdownIt = new MarkdownIt({
-        html: true
+        html: true,
+        breaks: true,
+        linkify: true,
+        ...options.markdownConfig
     });
-    // 设置markdown自定义代码块
-    config(md);
-
-    // markdown将md文件转换为预期代码
-    const code: string = md.render(source);
     
-    // vue组件标记开标签
-    const startTag: string = '<!-- <vue-component-block>';
-    // vue组件标记闭标签
-    const endTag: string = '</vue-component-block> --!>';
-    // 下一次检索起始位置
-    let start: number = 0;
-    // vue组件标记开标签位置
-    let tagBeginIndex:number = code.indexOf(startTag, start);
-    //  vue组件标记闭标签位置
-    let tagEndIndex:number = code.indexOf(endTag, tagBeginIndex + startTag.length);
-    // 最终输出html内容
-    let templateContent: string = '';
-    // vue 组件名标志
+    // 组件名计数
     let componentIndex: number = 0;
-    // script 引入vue组件
-    let srciptImport: string = '';
     // components 属性
     let components: string[] = [];
+    // 生成script引入当前md文件对应的组件
+    let srciptImport: string = '';
 
-    while (tagBeginIndex >= 0 && tagEndIndex >= 0) {
-        templateContent += code.slice(start, tagBeginIndex);
-        // 编译vue组件字符串
-        const componentName: string =`component${componentIndex}`;
+    // 设置markdown自定义代码块
+    config(md, {
+        containerName: options.containerName,
+        demoWrapperClass: options.demoWrapperClass,
+        descClass: options.descWrapperClass,
+        highlightClass: options.highlightClass,
+        beforeDemoSlotName: options.beforeDemoSlotName,
+        afterDemoSlotName: options.afterDemoSlotName,
+        beforeDescSlotName: options.beforeDescSlotName,
+        afterDescSlotName: options.afterDescSlotName,
+        beforeCodeSlotName: options.beforeCodeSlotName,
+        afterCodeSlotName: options.afterCodeSlotName
+    }, function(){
+        // 生成唯一组件名，防止与全局冲突
+        const componentName: string = `${uniqComponentName}${componentIndex}`;
+        // 生成新的请求参数请求当前md文件对应的vue代码
         const request: string = `${resourcePath}?fence&componentIndex=${componentIndex++}`;
+        // 引入组件
         srciptImport += `import ${componentName} from ${loaderUtils.stringifyRequest(loaderContext, request)};`;
-        templateContent += `<${componentName}></${componentName}>`;
-        components.push(`${componentName}: ${componentName}`);
-        start = tagEndIndex + endTag.length;
-        tagBeginIndex = code.indexOf(startTag, start);
-        tagEndIndex = code.indexOf(endTag, tagBeginIndex + startTag.length);
+        // 局部注册组件
+        components.push(`'${componentName}': ${componentName}`);
+        return componentName;
+    });
+
+    // 装载markdown插件
+    if(options.plugins && options.plugins.length > 0){
+        let len = options.plugins.length;
+        while(len--){
+            const curPlugin = options.plugins[len];
+            md.use(curPlugin.plugin, ...curPlugin.options);
+        }
     }
 
-    if(start > 0){
-        templateContent += code.slice(start);
-    }
+    // markdown将md文件转换为html代码
+    const code: string = md.render(source);
 
     const ret = `
         <template>
             <div class="demo">
-                ${templateContent}
+                ${code}
             </div>
         </template>
 
@@ -117,7 +127,6 @@ const convert: loader.Loader = function(source) {
         </script>
     `;
 
-    write(path.resolve(__dirname, 'aaa.vue'), ret);
     return `module.exports = ${ret}`;
 };
 
