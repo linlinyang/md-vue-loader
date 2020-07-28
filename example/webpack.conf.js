@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: webpack 配置文件
  * @Date: 2020-07-06 20:08:07
- * @LastEditTime: 2020-07-25 17:39:15
+ * @LastEditTime: 2020-07-28 20:41:24
  * @FilePath: f:\sourcecode\md-vue-loader\example\webpack.conf.js
  */ 
 const path = require('path');
