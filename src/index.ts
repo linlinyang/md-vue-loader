@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-07-25 16:24:37
+ * @LastEditTime: 2020-07-29 19:28:51
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
@@ -32,6 +32,9 @@ const convert: loader.Loader = function(source) {
     const queryParams = resourceQuery.length > 0
         ? loaderUtils.parseQuery(resourceQuery)
         : {};
+
+    // loader 参数
+    const options: Options = loaderUtils.getOptions(loaderContext);
         
     // 请求md文件中vue代码块
     if (queryParams.fence) {
@@ -40,7 +43,8 @@ const convert: loader.Loader = function(source) {
             ? Number(queryParams.componentIndex)
             : 0;
         // 从md文件中匹配特殊标记的vue代码
-        const matches: null | RegExpMatchArray = source.match(/:::demo[\s\S]*?:::/ig);
+        const demoReg: RegExp = new RegExp(`:::${options.containerName || 'demo'}[\\s\\S]*?:::`, 'ig');
+        const matches: null | RegExpMatchArray = source.match(demoReg);
         if (!matches || !matches[index]) {
             console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块失败。`);
             return '';
@@ -54,7 +58,6 @@ const convert: loader.Loader = function(source) {
         console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块中的vue代码块失败。`);
         return '';
     }
-    const options: Options = loaderUtils.getOptions(loaderContext);
     
     // 初始化markdownit
     const md: MarkdownIt = new MarkdownIt({

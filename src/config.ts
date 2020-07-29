@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: 配置markdownit，使用container加载自定义代码块
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-07-25 15:20:18
+ * @LastEditTime: 2020-07-29 19:39:05
  * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
  */ 
 
@@ -33,7 +33,7 @@ export default function(
     },
     getName: UniqComponentName
 ): void {
-    const containerReg: RegExp = new RegExp(`^${containerName}\\s+(.*)$`,'i');
+    const containerReg: RegExp = new RegExp(`^${containerName}[\\s\\S]*?$`,'i');
     
     md.use(container, containerName, {
         validate: (params: string): boolean => {
