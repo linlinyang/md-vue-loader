@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: 配置markdownit，使用container加载自定义代码块
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-07-29 19:39:05
+ * @LastEditTime: 2020-07-29 20:18:19
  * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
  */ 
 
@@ -24,6 +24,7 @@ export default function(
         demoWrapperClass = 'vue-demo-block',
         descClass = 'vue-demo-desc',
         highlightClass = 'vue-demo-highlight',
+        demoHighlightClass = 'demo-highlight',
         beforeDemoSlotName = 'beforeVueDemoBlock',
         afterDemoSlotName = 'afterVueDemoBlock',
         beforeDescSlotName = 'beforeDescDemoBlock',
@@ -65,7 +66,11 @@ export default function(
         idx: number
     ) {
         const token: Token = tokens[idx];
-        return `<pre v-pre ><code class="language-${token.info}">${md.utils.escapeHtml(token.content)}</code></pre>`;
+        return `
+            <div class="${demoHighlightClass}">
+                <pre v-pre ><code class="language-${token.info}">${md.utils.escapeHtml(token.content)}</code></pre>
+            </div>
+        `;
     };
     // 插入对等的高亮代码块
     md.renderer.rules.fence = function(tokens, idx, options, env, self): string {
