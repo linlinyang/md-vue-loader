@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-07-29 19:28:51
+ * @LastEditTime: 2020-07-31 20:53:56
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
@@ -15,7 +15,7 @@ import config from './config';
 import uniqid from 'uniqid';
 import Options from './options';
 
-// demo中vue代码转换为唯一组件名前缀
+// The uniqu name of child component for `vue demo code`
 const uniqComponentName: string = `Com${uniqid()}Demo`;
 
 const convert: loader.Loader = function(source) {
@@ -28,34 +28,37 @@ const convert: loader.Loader = function(source) {
         resourcePath,
         resourceQuery
     } = loaderContext;
-    // 解析请求字符串
+    // parse query params
     const queryParams = resourceQuery.length > 0
         ? loaderUtils.parseQuery(resourceQuery)
         : {};
 
-    // loader 参数
+    // loader options
     const options: Options = loaderUtils.getOptions(loaderContext);
         
-    // 请求md文件中vue代码块
+    // has fence mark
+    // strip the `vue demo code` directly
     if (queryParams.fence) {
-        // 请求md文件中的第n个vue代码块，从0开始
+        // the nth of component
         const index: number = typeof queryParams.componentIndex === 'string'
             ? Number(queryParams.componentIndex)
             : 0;
-        // 从md文件中匹配特殊标记的vue代码
+        // match the `vue demo code`
         const demoReg: RegExp = new RegExp(`:::${options.containerName || 'demo'}[\\s\\S]*?:::`, 'ig');
         const matches: null | RegExpMatchArray = source.match(demoReg);
         if (!matches || !matches[index]) {
-            console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块失败。`);
+            console.log(`${colors.warn('[markdone-vue-loader]')}: resolve ${index}th ${colors.error(':::demo')} in ${resourcePath} failed`);
             return '';
         }
 
+        // weed out description code
+        // get the real single file component format file
         const vueBlocks: null | RegExpMatchArray = matches[index].match(/```([\s\S]*?)(<[\s\S]*)```/i);
         if (vueBlocks && vueBlocks[2]) {
             return vueBlocks[2];
         }
 
-        console.log(`${colors.warn('[md-vue-loader]')}: 请求${resourcePath}中的第${index}个${colors.error(':::demo')}标记块中的vue代码块失败。`);
+        console.log(`${colors.warn('[markdone-vue-loader]')}: resolve ${index}th ${colors.error(':::demo')} markded vue code failed in ${resourcePath}.`);
         return '';
     }
     
@@ -67,14 +70,14 @@ const convert: loader.Loader = function(source) {
         ...options.markdownConfig
     });
     
-    // 组件名计数
+    // component name counter
     let componentIndex: number = 0;
-    // components 属性
+    // components props in this markdown-vue file
     let components: string[] = [];
-    // 生成script引入当前md文件对应的组件
+    // the final script appended
     let srciptImport: string = '';
 
-    // 设置markdown自定义代码块
+    // config markdown custom code
     config(md, {
         containerName: options.containerName,
         demoWrapperClass: options.demoWrapperClass,
@@ -87,18 +90,18 @@ const convert: loader.Loader = function(source) {
         beforeCodeSlotName: options.beforeCodeSlotName,
         afterCodeSlotName: options.afterCodeSlotName
     }, function(){
-        // 生成唯一组件名，防止与全局冲突
+        // gen uniq component Name
         const componentName: string = `${uniqComponentName}${componentIndex}`;
-        // 生成新的请求参数请求当前md文件对应的vue代码
+        // gen query params
         const request: string = `${resourcePath}?fence&componentIndex=${componentIndex++}`;
-        // 引入组件
+        // import component
         srciptImport += `import ${componentName} from ${loaderUtils.stringifyRequest(loaderContext, request)};`;
-        // 局部注册组件
+        // regist child component
         components.push(`'${componentName}': ${componentName}`);
         return componentName;
     });
 
-    // 装载markdown插件
+    // install markdown plugins if exist
     if(options.plugins && options.plugins.length > 0){
         let len = options.plugins.length;
         while(len--){
@@ -107,12 +110,18 @@ const convert: loader.Loader = function(source) {
         }
     }
 
-    // markdown将md文件转换为html代码
+    // markdownit convert md fiele to html file
     const code: string = md.render(source);
 
-    const ret = `
+    // the div className wrapped all md file
+    const templateClass: string = options.templateClass 
+        ? `class="${options.templateClass}"`
+        : '';
+
+    // the final return
+    const ret: string = `
         <template>
-            <div class="demo">
+            <div ${templateClass}>
                 ${code}
             </div>
         </template>

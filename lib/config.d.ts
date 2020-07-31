@@ -2,17 +2,17 @@ import MarkdownIt from 'markdown-it';
 interface UniqComponentName {
     (): string;
 }
-export default function (md: MarkdownIt, { containerName, demoWrapperClass, descClass, highlightClass, demoHighlightClass, beforeDemoSlotName, afterDemoSlotName, beforeDescSlotName, afterDescSlotName, beforeCodeSlotName, afterCodeSlotName }: {
-    containerName?: string | undefined;
-    demoWrapperClass?: string | undefined;
-    descClass?: string | undefined;
-    highlightClass?: string | undefined;
-    demoHighlightClass?: string | undefined;
-    beforeDemoSlotName?: string | undefined;
-    afterDemoSlotName?: string | undefined;
-    beforeDescSlotName?: string | undefined;
-    afterDescSlotName?: string | undefined;
-    beforeCodeSlotName?: string | undefined;
-    afterCodeSlotName?: string | undefined;
-}, getName: UniqComponentName): void;
+interface Options {
+    containerName?: string;
+    demoWrapperClass?: string;
+    descClass?: string;
+    highlightClass?: string;
+    beforeDemoSlotName?: string;
+    afterDemoSlotName?: string;
+    beforeDescSlotName?: string;
+    afterDescSlotName?: string;
+    beforeCodeSlotName?: string;
+    afterCodeSlotName?: string;
+}
+export default function (md: MarkdownIt, { containerName, demoWrapperClass, descClass, highlightClass, beforeDemoSlotName, afterDemoSlotName, beforeDescSlotName, afterDescSlotName, beforeCodeSlotName, afterCodeSlotName }: Options, getName: UniqComponentName): void;
 export {};

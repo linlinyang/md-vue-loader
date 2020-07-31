@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: webpack 配置文件
  * @Date: 2020-07-06 20:08:07
- * @LastEditTime: 2020-07-28 20:41:24
+ * @LastEditTime: 2020-07-31 20:12:37
  * @FilePath: f:\sourcecode\md-vue-loader\example\webpack.conf.js
  */ 
 const path = require('path');
@@ -33,7 +33,13 @@ module.exports = {
             use: [{
                 loader: 'vue-loader'
             },{
-                loader: 'markdone-vue-loader'
+                loader: 'markdone-vue-loader',
+                options: {
+                    demoWrapperClass: 'vue-demo-wrapper',
+                    templateClass: 'vue-demo-container',
+                    descWrapperClass: 'vue-demo-desc',
+                    highlightClass: 'vue-demo-highlight'
+                }
             }]
         },{
             test: /\.(sa|sc|c)ss$/,

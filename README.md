@@ -81,97 +81,111 @@ Then this md file pass this loader second:
 1. Parse the params, `fence` is a mark , the `componentIndex` used to get which `Vue demo code` will return.
 2. Use regexp to get `Vue demo code` wrapped between  `:::demo` and `:::` and return it.
 
-## Description
+## Convert sample
 
-The description for this loader convert process.
+The convert sample will help to beautify the final results.
 
 ```js
 /**
- * markdone-vue-loader convert exmample
+ * markdone-vue-loader convert sample
  * 
- * source md：
- * :::${containerName: demo} code description 
+ * srouce code：
+ * 
+ * some markdown content...
+ * :::${containerName: demo} some code descriptions
  *  ``` vue
  *      vue demo code
  *  ```
  * :::
+ * some markdown content...
  * 
- * ===> result
+ * ===> convert result
  * 
- * <div class="${demoWrapperClass}">
- *      <slot name="${beforeDemoSlotName}"></slot>
- *          vue demo code render result
- *      <slot name="${afterDemoSlotName}"></slot>
- * </div>
- * 
- * <div class="${descClass}">
- *      <slot name="${beforeDescSlotName}"></slot>
- *          code description
- *     <slot name="${afterDescSlotName}"></slot>
- * </div>
- * 
- * <div class="${highlightClass}">
- *      <slot name="${beforeCodeSlotName}"></slot>
- *      <prev><code class="html" v-pre >
- *          source vue demo code
- *      </code></prev>
- *      <slot name="${afterCodeSlotName}"></slot>
- * </div>
+ * <template>
+ *  <div class="${templateClass}">
+ *      some markdown content ...
+ *      <div class="${demoWrapperClass}">
+ *           <slot name="${beforeDemoSlotName}"></slot>
+ *               vue demo code render result
+ *           <slot name="${afterDemoSlotName}"></slot>
+ *      </div>
+ *      
+ *      <div class="${descClass}">
+ *           <slot name="${beforeDescSlotName}"></slot>
+ *               some code descriptions
+ *          <slot name="${afterDescSlotName}"></slot>
+ *      </div>
+ *      
+ *      <div class="${highlightClass}">
+ *           <slot name="${beforeCodeSlotName}"></slot>
+ *           <prev><code class="html" v-pre >
+ *               source vue demo code
+ *           </code></prev>
+ *           <slot name="${afterCodeSlotName}"></slot>
+ *      </div>
+ *      some markdown content ...
+ *  </div>
+ * </template>
  */
 ```
 
-**Note**: The variables wrapper `${}` will be setted in loader options
+**Note**: The variables wrapper `${}` will be setted in loader options by yourself. The class and slot can not be show if the className and slot name do not setted.
 
 ## Loader Options
 
 ```typescript
-
 /**
- * markdone-vue-loader Options
+ * markdone-vue-loader options
  */
 interface Options {
     /**
+     * As a mark of `vue demo code` 
      * @default "demo"
      */
     readonly containerName?: string;
     /**
-     * @default "vue-demo-block"
+     * the div className wrapped all markdown file
+     */
+    readonly templateClass?: string;
+    /**
+     * the div className wrapped `vue demo code` render result
      */
     readonly demoWrapperClass?: string;
     /**
-     * @default "vue-demo-desc"
+     * the div className wrapped the `vue demo code` descriptions
      */
     readonly descWrapperClass?: string;
     /**
-     * @default "vue-demo-highlight"
+     * the div className wrapped the `vue demo code` source code
      */
     readonly highlightClass?: string;
     /**
-     * @default "beforeVueDemoBlock"
+     * the slot's name before `vue demo code` render result
      */
     readonly beforeDemoSlotName?: string,
     /**
-     * @default "afterVueDemoBlock"
+     * the slot's name after `vue demo code` render result
      */
     readonly afterDemoSlotName?: string,
     /**
-     * @default "beforeDescDemoBlock"
+     * the slot's name before `vue demo code` descriptions
      */
     readonly beforeDescSlotName?: string,
     /**
+     * the slot's name after `vue demo code` descriptions
      * @default "afterDescDemoBlock"
      */
     readonly afterDescSlotName?: string,
     /**
-     * @default "beforeCodeDemoBlock"
+     * the slot's name before `vue demo code` source code
      */
     readonly beforeCodeSlotName?: string,
     /**
-     * @default "afterCodeDemoBlock"
+     * the slot's name after `vue demo code` source code
      */
     readonly afterCodeSlotName?: string,
     /**
-     * markdownit Configuration http://markdown-it.docschina.org/
+     * markdownit configuration：http://markdown-it.docschina.org/
      * @default 
      * {
      *  html: true,

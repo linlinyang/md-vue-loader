@@ -1,34 +1,43 @@
 /**
- * markdone-vue-loader 转换示例
+ * markdone-vue-loader convert sample
  *
- * 原始代码：
- * :::${containerName: demo} 一些代码简介
+ * srouce code：
+ *
+ * some markdown content...
+ * :::${containerName: demo} some code descriptions
  *  ``` vue
- *      vue组件代码
+ *      vue demo code
  *  ```
  * :::
+ * some markdown content...
  *
- * ===> 转换结果
+ * ===> convert result
  *
- * <div class="${demoWrapperClass}">
- *      <slot name="${beforeDemoSlotName}"></slot>
- *          组件渲染结果
- *      <slot name="${afterDemoSlotName}"></slot>
- * </div>
+ * <template>
+ *  <div class="${templateClass}">
+ *      some markdown content ...
+ *      <div class="${demoWrapperClass}">
+ *           <slot name="${beforeDemoSlotName}"></slot>
+ *               vue demo code render result
+ *           <slot name="${afterDemoSlotName}"></slot>
+ *      </div>
  *
- * <div class="${descClass}">
- *      <slot name="${beforeDescSlotName}"></slot>
- *          一些代码简介
- *     <slot name="${afterDescSlotName}"></slot>
- * </div>
+ *      <div class="${descClass}">
+ *           <slot name="${beforeDescSlotName}"></slot>
+ *               some code descriptions
+ *          <slot name="${afterDescSlotName}"></slot>
+ *      </div>
  *
- * <div class="${highlightClass}">
- *      <slot name="${beforeCodeSlotName}"></slot>
- *      <prev><code class="html" v-pre >
- *          源代码
- *      </code></prev>
- *      <slot name="${afterCodeSlotName}"></slot>
- * </div>
+ *      <div class="${highlightClass}">
+ *           <slot name="${beforeCodeSlotName}"></slot>
+ *           <prev><code class="html" v-pre >
+ *               source vue demo code
+ *           </code></prev>
+ *           <slot name="${afterCodeSlotName}"></slot>
+ *      </div>
+ *      some markdown content ...
+ *  </div>
+ * </template>
  */
 import MarkdownIt from 'markdown-it';
 /**
@@ -39,61 +48,57 @@ interface MarkdownItPluginOptions {
     readonly options: any[];
 }
 /**
- * markdone-vue-loader 参数
+ * markdone-vue-loader options
  */
 interface Options {
     /**
-     * md文档中包裹示例代码标记
+     * As a mark of `vue demo code`
      * @default "demo"
      */
     readonly containerName?: string;
     /**
-     * vue组件运行包裹div类名
-     * @default "vue-demo-block"
+     * the div className wrapped all markdown file
+     */
+    readonly templateClass?: string;
+    /**
+     * the div className wrapped `vue demo code` render result
      */
     readonly demoWrapperClass?: string;
     /**
-     * 标记代码块简介包裹div的类名
-     * @default "vue-demo-desc"
+     * the div className wrapped the `vue demo code` descriptions
      */
     readonly descWrapperClass?: string;
     /**
-     * 标记代码块实际代码包裹div的类名
-     * @default "vue-demo-highlight"
+     * the div className wrapped the `vue demo code` source code
      */
     readonly highlightClass?: string;
     /**
-     * 示例代码前插槽名
-     * @default "beforeVueDemoBlock"
+     * the slot's name before `vue demo code` render result
      */
     readonly beforeDemoSlotName?: string;
     /**
-     * 示例代码后插槽名
-     * @default "afterVueDemoBlock"
+     * the slot's name after `vue demo code` render result
      */
     readonly afterDemoSlotName?: string;
     /**
-     * 简介代码前插槽名
-     * @default "beforeDescDemoBlock"
+     * the slot's name before `vue demo code` descriptions
      */
     readonly beforeDescSlotName?: string;
     /**
-     * 简介代码后插槽名
+     * the slot's name after `vue demo code` descriptions
      * @default "afterDescDemoBlock"
      */
     readonly afterDescSlotName?: string;
     /**
-     * 源代码前插槽名
-     * @default "beforeCodeDemoBlock"
+     * the slot's name before `vue demo code` source code
      */
     readonly beforeCodeSlotName?: string;
     /**
-     * 源代码前插槽名
-     * @default "afterCodeDemoBlock"
+     * the slot's name after `vue demo code` source code
      */
     readonly afterCodeSlotName?: string;
     /**
-     * markdownit配置信息，详情参考：http://markdown-it.docschina.org/
+     * markdownit configuration：http://markdown-it.docschina.org/
      * @default
      * {
      *  html: true,
@@ -103,7 +108,7 @@ interface Options {
      */
     readonly markdownConfig?: MarkdownIt.Options;
     /**
-     * 配置自定义markdownit插件
+     * custom markdownit plugins
      * @example
      * [{
      *  plugin: require('markdown-it-anchor'),
