@@ -1,8 +1,8 @@
 /*
  * @Author: Yang Lin
- * @Description: 配置markdownit，使用container加载自定义代码块
+ * @Description: config markdownit
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-07-31 20:57:49
+ * @LastEditTime: 2020-08-01 22:00:47
  * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
  */ 
 
@@ -11,8 +11,7 @@ import container from 'markdown-it-container';
 import Token = require('markdown-it/lib/token');
 import Renderer = require('markdown-it/lib/renderer');
 
-// 每次生成自定义代码时调用
-// 生成当前md文件中唯一的组件名
+// gen component uniq name
 interface UniqComponentName {
     (): string
 }

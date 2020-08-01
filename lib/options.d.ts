@@ -86,7 +86,6 @@ interface Options {
     readonly beforeDescSlotName?: string;
     /**
      * the slot's name after `vue demo code` descriptions
-     * @default "afterDescDemoBlock"
      */
     readonly afterDescSlotName?: string;
     /**

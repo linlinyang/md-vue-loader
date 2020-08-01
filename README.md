@@ -4,7 +4,7 @@
 >
 > If target markdown file contains Vue code and wrapped between `:::demo` and `:::`, then rendered it as children Vue component , also retain the source Vue code.
 >
-> It useful for writting document for Vue components libary .
+> It useful for put demo code in md file when writting Vue components libary. 
 
 **Note**: For markdown-vue-loader has been registed, I used `markdone`.
 
@@ -17,10 +17,10 @@
 1. Installation
 
 ```shell
-npm install markdone-vue-loader
+npm install markdone-vue-loader vue-loader
 ```
 
-2. Configuration
+2. Configuration webpack
 
 ```javascript
 // webpack.conf.js
@@ -51,14 +51,15 @@ module: {
 
 ## How it works
 
-> The following section is  the internal implementation details of `markdone-vue-loader`, for interested readers
+> The following section is  the internal implementation details of `markdone-vue-loader`, for interested readers, for easy use.
 
 The md file first pass this loader:
 
 1. Use [markdown-it](https://www.npmjs.com/package/markdown-it) convert md file to html.
-2. Mark  the `Vue demo code` as `<component0></component0>,<component1></component1>...` with the help of [markdown-it-container](https://www.npmjs.com/package/markdown-it-container). We will regist those customer component in follow steps.
-3. Config `md.renderer.rules.fence` to hold the source code, use `v-pre` directive to wrapper it.
-4. Return result will be vue component ,so we wrapper the `step 1 html` in `<template></template>`. Append `script` to regist custom component:
+2. Mark  the `Vue demo code` as `<component0></component0>,<component1></component1>...` with the help of [markdown-it-container](https://www.npmjs.com/package/markdown-it-container). 
+3. Config `md.renderer.rules.fence` to hold the source code, use `vue` built-in directive`v-pre` skip compile.
+4. Use `template` wrapper up steps's result as Vue Single-File template.
+5. Append script to regist child component for  `vue demo code`:
 
 ```html
 <script>
@@ -74,12 +75,14 @@ The md file first pass this loader:
 </script>
 ```
 
-We config the vue-loader as next , as the `<component0></component0>,<component1></component1>...` rendered, it will reslove this markdown file again with special params.
+Then, `md` files has been convert to Vue Single-File, and the next loader is `vue-loader`，`import component0 from './this-markdown.md?fence&componentIndex=0';` will resolve this `md` file again with some params.
 
-Then this md file pass this loader second:
+The md file pass this loader second:
 
-1. Parse the params, `fence` is a mark , the `componentIndex` used to get which `Vue demo code` will return.
-2. Use regexp to get `Vue demo code` wrapped between  `:::demo` and `:::` and return it.
+1. Parse the params, `fence` used to distinguish whether it is the first processing , the `componentIndex` used to get which `Vue demo code` will return.
+2. Use regexp to get the real `Vue demo code` and return it, then hand it back to ` vue-loader`.
+
+At this point, the processing flow has been completed.
 
 ## Convert sample
 
@@ -129,7 +132,7 @@ The convert sample will help to beautify the final results.
  */
 ```
 
-**Note**: The variables wrapper `${}` will be setted in loader options by yourself. The class and slot can not be show if the className and slot name do not setted.
+**Note**: The variables wrapper `${}` will be setted in loader options by yourself. The class and slot property related content do not be convert if not setted.
 
 ## Loader Options
 
@@ -173,7 +176,6 @@ interface Options {
     readonly beforeDescSlotName?: string,
     /**
      * the slot's name after `vue demo code` descriptions
-     * @default "afterDescDemoBlock"
      */
     readonly afterDescSlotName?: string,
     /**

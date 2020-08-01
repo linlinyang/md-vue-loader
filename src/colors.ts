@@ -1,8 +1,8 @@
 /*
  * @Author: Yang Lin
- * @Description: 简介
+ * @Description: terminal console
  * @Date: 2020-07-12 17:27:40
- * @LastEditTime: 2020-07-23 20:24:34
+ * @LastEditTime: 2020-08-01 22:01:41
  * @FilePath: f:\sourcecode\md-vue-loader\src\colors.ts
  */ 
 

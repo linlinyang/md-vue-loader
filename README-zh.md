@@ -1,27 +1,23 @@
 # markdone-vue-loader
 
-> 构建自己的组件库的时候，为了查看效果，我们需要编写一套demo来调试我们的代码
+> 一款用于将markdown文件转换为`Vue`单文本组件的`webpack loader`。
 >
-> 然后在编写文档的时候，我们又需要将demo中的代码修改后做示例代码，展示在文档中，而且展示代码还不能运行
+> 如果markdown文件中的`vue组件`代码被`:::demo`和`:::`包裹，那么这个`vue组件`代码将会被直接渲染出来，并保留源代码。
 >
-> 本loader的作用就是将`markdown`文档中的`vue`代码提取运行，这样既可以预览代码结果用作调试和展示
->
-> 同时我们还保留的文档中的`vue`源代码，用作展示
->
-> `markdown`中其他部分内容通过`markdown-it`插件转换为`html`代码
+> 编写vue组件库的时候，可将示例代码放在文档中，减少工作量和维护成本。
 
-**注意：** 这里的`markdone`名字是故意写错的，正确的名字已经被占用，主要还是用作于转换markdown文件
+**注意：**由于`markdown-vue-loader`已被注册，所以使用`markdone-vue-loader`。
 
+**注意：**本文中`Vue demo code`不做特别申明，即被`:::demo`和`:::`包裹的`vue`组件代码。
 
+[English document](README.md)
 
 ## 使用
 
-示例代码可在仓库代码中下载并运行`npm install && npm run dev`查看效果
+1、安装
 
-1、安装依赖
-
-```
-npm install markdone-vue-loader
+```shell
+npm install markdone-vue-loader vue-loader
 ```
 
 2、配置`webpack`的`loader`
@@ -43,100 +39,35 @@ module: {
         },{
             loader: 'markdone-vue-loader',
             options: {
-                // 更多配置参考  src/options.ts
+                ...
             }
         }]
     }]
 }
 ```
 
-3、编写`md`文件，注意`vue`代码块（必须是`markdown`标记代码块）必须被`:::demo`和`:::`包裹（“demo”可以在此loader配置参数中设置）。
+3、然后你的markdown文件都被挡住Vue单文本组件来处理，`vue demo code`渲染时被当做子组件处理并且支持`vue-loader`所有功能。
 
-~~~vue
-// ButtonDemo.md
-## Button 组件
-
-一、`Button` 组件的基本使用
-
-:::demo #### Button 组件基础用法:
-
-``` vue
-
-<template>
-    <div class="demo">
-        <Button>默认按钮</Button>
-        <Button type="primary">主要按钮</Button>
-        <Button type="success">主要按钮</Button>
-    </div>
-</template>
-
-<script>
-import Button from "./components/Button";
-
-export default {
-    name: 'ButtonDemo',
-    components: {
-        Button
-    }
-};
-</script>
-
-<style scoped >
-    .demo{
-        padding-bottom: 20px;
-        border-bottom: 1px solid #333;
-        width: 100%;
-        position: relative;
-    }
-</style>
-
-```
-:::
-~~~
-
-4、像`vue`组件代码一样引入`md`文件
-
-```vue
-// app.vue
-<template>
-    <div class="demo-button">
-        <ButtonDemo></ButtonDemo>
-    </div>
-</template>
-
-<script>
-import 'highlight.js/styles/atom-one-dark.css'; // 代码高亮主题
-import hljs from 'highlight.js'; // 高亮代码
-import ButtonDemo from './ButtonDemo.md';
-
-export default {
-    name: 'APP',
-    components: {
-        ButtonDemo
-    },
-    mounted(){
-        this.$nextTick(() => {
-            [...document.querySelectorAll('.vue-demo-highlight pre code:not(.hljs)')].forEach(block => {
-                hljs.highlightBlock(block);
-            });
-        });
-    }
-};
-</script>
-```
+4、[下载本loader](https://github.com/linlinyang/md-vue-loader)，然后运行`npm install && npm run dev`即可查看示例demo。
 
 
 
 ## 原理
 
-1、`md`文件通过此`loader`，非`vue`代码被`markdown-it`转换为`html`代码。同时`vue`代码被`<pre><code v-pre >`和`</pre></code>`包裹，可用作高亮展示。
+> 一下内容将讲述此loader工作原理，感兴趣的可以阅读并帮助使用。
 
-2、由于会存在多个`vue`代码，所以将`vue`代码替换为类似：`<component0></component0>、<component1></component1>`，然后在`md`文件底部添加`script`：
+`markdown`文件第一次被此loader处理：
 
-```
+1. 使用[markdown-it](https://www.npmjs.com/package/markdown-it) 将`markdown`文件转换为`html`。
+2. 使用[markdown-it-container](https://www.npmjs.com/package/markdown-it-container)将`vue demo code`标记为`<component0></component0>,<component1></component1>...`。
+3. 配置`md.renderer.rules.fence`，保留`vue demo code`源代码，使用`vue`内置指令`v-pre`跳过编译。
+4. 使用`template`包裹以上步骤处理的`html`标记，使之作为vue单文本组件的渲染模板。
+5. 增加`script`来注册`vue demo code`为子组件:
+
+```javascript
 <script>
-	import component0 from './本markdown文件.md?fence&componentIndex=0';
-    import component1 from './本markdown文件.md?fence&componentIndex=1';
+	import component0 from './this-markdown.md?fence&componentIndex=0';
+    import component1 from './this-markdown.md?fence&componentIndex=1';
     export default {
         name: 'ComponentDoc',
         components: {
@@ -147,111 +78,121 @@ export default {
 </script>
 ```
 
-3、在底部`script`中添加参数重新引入当前`md`文件
+这时，md文件已经被我们处理成vue单文本组件了，这里我们配置`vue-loader`作为下一个loader，在处理这个组件时，`import component0 from './this-markdown.md?fence&componentIndex=0';`会带有请求参数次再加载这个md文件。
 
-4、由于标记了参数，然后此`loader`再次转换这个`md`文件时，只需要返回原来的`vue`源代码交还`vue-loader`处理就行
+`markdown`带参数第二次被此loader处理：
 
-5、转换结果大致如下：
+1. 解析请求参数，`fence`用来区分是否是第一次请求这个md文件， `componentIndex` 用来获取第几个`vue demo code`。
+2. 使用正则获取实际的`vue demo code`并返回交还给`vue-loader`处理。
+
+至此，处理流程已完成。
+
+## 转换结果示例
+
+参考转换结果示例，可以用于美化最终转换结果。
 
 ```js
 /**
- * markdone-vue-loader 转换示例
+ * markdone-vue-loader convert sample
  * 
- * 原始代码：
- * :::${containerName: demo} 一些代码简介 
+ * srouce code：
+ * 
+ * some markdown content...
+ * :::${containerName: demo} some code descriptions
  *  ``` vue
- *      vue组件代码
+ *      vue demo code
  *  ```
  * :::
+ * some markdown content...
  * 
- * ===> 转换结果
+ * ===> convert result
  * 
- * <div class="${demoWrapperClass}">
- *      <slot name="${beforeDemoSlotName}"></slot>
- *          组件渲染结果
- *      <slot name="${afterDemoSlotName}"></slot>
- * </div>
- * 
- * <div class="${descClass}">
- *      <slot name="${beforeDescSlotName}"></slot>
- *          一些代码简介 
- *     <slot name="${afterDescSlotName}"></slot>
- * </div>
- * 
- * <div class="${highlightClass}">
- *      <slot name="${beforeCodeSlotName}"></slot>
- *      <prev><code class="html" v-pre >
- *          源代码
- *      </code></prev>
- *      <slot name="${afterCodeSlotName}"></slot>
- * </div>
+ * <template>
+ *  <div class="${templateClass}">
+ *      some markdown content ...
+ *      <div class="${demoWrapperClass}">
+ *           <slot name="${beforeDemoSlotName}"></slot>
+ *               vue demo code render result
+ *           <slot name="${afterDemoSlotName}"></slot>
+ *      </div>
+ *      
+ *      <div class="${descClass}">
+ *           <slot name="${beforeDescSlotName}"></slot>
+ *               some code descriptions
+ *          <slot name="${afterDescSlotName}"></slot>
+ *      </div>
+ *      
+ *      <div class="${highlightClass}">
+ *           <slot name="${beforeCodeSlotName}"></slot>
+ *           <prev><code class="html" v-pre >
+ *               source vue demo code
+ *           </code></prev>
+ *           <slot name="${afterCodeSlotName}"></slot>
+ *      </div>
+ *      some markdown content ...
+ *  </div>
+ * </template>
  */
 ```
 
-注意：以上代码中被`${}`标记的都是可以在`loader`参数中设置的变量
+注意：以上代码中被`${}`标记的变量都是可以在`loader`参数中设置，class和slot相关属性没有被设置将不被转换出对应的内容。
 
 
 
 ## loader参数
 
 ```typescript
-
 /**
  * markdone-vue-loader 参数
  */
 interface Options {
     /**
-     * md文档中包裹示例代码标记
+     * 用于标记 `vue demo code` 代码
      * @default "demo"
      */
     readonly containerName?: string;
     /**
-     * vue组件运行包裹div类名
-     * @default "vue-demo-block"
+     * 包裹markdown文件的转换结果的div的类名
+     */
+    readonly templateClass?: string;
+    /**
+     * 包裹`vue demo code` 渲染结果的div的类名
      */
     readonly demoWrapperClass?: string;
     /**
-     * 标记代码块简介包裹div的类名
-     * @default "vue-demo-desc"
+     * 包裹`vue demo code` 简介渲染结果的div的类名
      */
     readonly descWrapperClass?: string;
     /**
-     * 标记代码块实际代码包裹div的类名
-     * @default "vue-demo-highlight"
+     * 包裹`vue demo code` 源码的div的类名
      */
     readonly highlightClass?: string;
     /**
-     * 示例代码前插槽名
-     * @default "beforeVueDemoBlock"
+     * `vue demo code` 前插槽名
      */
     readonly beforeDemoSlotName?: string,
     /**
-     * 示例代码后插槽名
-     * @default "afterVueDemoBlock"
+     * `vue demo code` 后插槽名
      */
     readonly afterDemoSlotName?: string,
     /**
-     * 简介代码前插槽名
-     * @default "beforeDescDemoBlock"
+     * `vue demo code` 简介前插槽名
      */
     readonly beforeDescSlotName?: string,
     /**
-     * 简介代码后插槽名
-     * @default "afterDescDemoBlock"
+     * `vue demo code` 简介后插槽名
      */
     readonly afterDescSlotName?: string,
     /**
-     * 源代码前插槽名
-     * @default "beforeCodeDemoBlock"
+     * `vue demo code` 源码前插槽名
      */
     readonly beforeCodeSlotName?: string,
     /**
-     * 源代码前插槽名
-     * @default "afterCodeDemoBlock"
+     * `vue demo code` 源码后插槽名
      */
     readonly afterCodeSlotName?: string,
     /**
-     * markdownit配置信息，详情参考：http://markdown-it.docschina.org/
+     * markdown 配置：http://markdown-it.docschina.org/
      * @default 
      * {
      *  html: true,
@@ -261,7 +202,7 @@ interface Options {
      */
     readonly markdownConfig?: MarkdownIt.Options;
     /**
-     * 配置自定义markdownit插件
+     * 自定义markdownit插件
      * @example 
      * [{
      *  plugin: require('markdown-it-anchor'),
