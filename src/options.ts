@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader options
  * @Date: 2020-07-24 21:15:59
- * @LastEditTime: 2020-08-01 21:58:46
+ * @LastEditTime: 2020-08-05 19:29:29
  * @FilePath: f:\sourcecode\md-vue-loader\src\options.ts
  */ 
 
@@ -86,27 +86,27 @@ interface Options {
     /**
      * the slot's name before `vue demo code` render result
      */
-    readonly beforeDemoSlotName?: string,
+    readonly beforeDemoSlotName?: string;
     /**
      * the slot's name after `vue demo code` render result
      */
-    readonly afterDemoSlotName?: string,
+    readonly afterDemoSlotName?: string;
     /**
      * the slot's name before `vue demo code` descriptions
      */
-    readonly beforeDescSlotName?: string,
+    readonly beforeDescSlotName?: string;
     /**
      * the slot's name after `vue demo code` descriptions
      */
-    readonly afterDescSlotName?: string,
+    readonly afterDescSlotName?: string;
     /**
      * the slot's name before `vue demo code` source code
      */
-    readonly beforeCodeSlotName?: string,
+    readonly beforeCodeSlotName?: string;
     /**
      * the slot's name after `vue demo code` source code
      */
-    readonly afterCodeSlotName?: string,
+    readonly afterCodeSlotName?: string;
     /**
      * markdownit configuration：http://markdown-it.docschina.org/
      * @default 

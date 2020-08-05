@@ -165,27 +165,27 @@ interface Options {
     /**
      * the slot's name before `vue demo code` render result
      */
-    readonly beforeDemoSlotName?: string,
+    readonly beforeDemoSlotName?: string;
     /**
      * the slot's name after `vue demo code` render result
      */
-    readonly afterDemoSlotName?: string,
+    readonly afterDemoSlotName?: string;
     /**
      * the slot's name before `vue demo code` descriptions
      */
-    readonly beforeDescSlotName?: string,
+    readonly beforeDescSlotName?: string;
     /**
      * the slot's name after `vue demo code` descriptions
      */
-    readonly afterDescSlotName?: string,
+    readonly afterDescSlotName?: string;
     /**
      * the slot's name before `vue demo code` source code
      */
-    readonly beforeCodeSlotName?: string,
+    readonly beforeCodeSlotName?: string;
     /**
      * the slot's name after `vue demo code` source code
      */
-    readonly afterCodeSlotName?: string,
+    readonly afterCodeSlotName?: string;
     /**
      * markdownit configuration：http://markdown-it.docschina.org/
      * @default 

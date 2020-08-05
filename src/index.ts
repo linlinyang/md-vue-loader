@@ -2,7 +2,7 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-07-31 20:53:56
+ * @LastEditTime: 2020-08-05 19:30:38
  * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
@@ -18,6 +18,12 @@ import Options from './options';
 // The uniqu name of child component for `vue demo code`
 const uniqComponentName: string = `Com${uniqid()}Demo`;
 
+// loader query params
+type QueryOptions = Partial<loaderUtils.OptionObject> | {
+    fence: boolean | null | string;
+    componentIndex: boolean | null | string
+}
+
 const convert: loader.Loader = function(source) {
     if(source instanceof Buffer){
         return source;
@@ -29,9 +35,12 @@ const convert: loader.Loader = function(source) {
         resourceQuery
     } = loaderContext;
     // parse query params
-    const queryParams = resourceQuery.length > 0
+    const queryParams: QueryOptions = resourceQuery.length > 0
         ? loaderUtils.parseQuery(resourceQuery)
-        : {};
+        : {
+            fence: false,
+            componentIndex: null
+        };
 
     // loader options
     const options: Options = loaderUtils.getOptions(loaderContext);
@@ -41,7 +50,9 @@ const convert: loader.Loader = function(source) {
     if (queryParams.fence) {
         // the nth of component
         const index: number = typeof queryParams.componentIndex === 'string'
-            ? Number(queryParams.componentIndex)
+            ? isNaN(Number(queryParams.componentIndex))
+                ? 0
+                : Number(queryParams.componentIndex)
             : 0;
         // match the `vue demo code`
         const demoReg: RegExp = new RegExp(`:::${options.containerName || 'demo'}[\\s\\S]*?:::`, 'ig');

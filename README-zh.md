@@ -170,27 +170,27 @@ interface Options {
     /**
      * `vue demo code` 前插槽名
      */
-    readonly beforeDemoSlotName?: string,
+    readonly beforeDemoSlotName?: string;
     /**
      * `vue demo code` 后插槽名
      */
-    readonly afterDemoSlotName?: string,
+    readonly afterDemoSlotName?: string;
     /**
      * `vue demo code` 简介前插槽名
      */
-    readonly beforeDescSlotName?: string,
+    readonly beforeDescSlotName?: string;
     /**
      * `vue demo code` 简介后插槽名
      */
-    readonly afterDescSlotName?: string,
+    readonly afterDescSlotName?: string;
     /**
      * `vue demo code` 源码前插槽名
      */
-    readonly beforeCodeSlotName?: string,
+    readonly beforeCodeSlotName?: string;
     /**
      * `vue demo code` 源码后插槽名
      */
-    readonly afterCodeSlotName?: string,
+    readonly afterCodeSlotName?: string;
     /**
      * markdown 配置：http://markdown-it.docschina.org/
      * @default 
