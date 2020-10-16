@@ -2,8 +2,8 @@
  * @Author: Yang Lin
  * @Description: loader 入口
  * @Date: 2020-07-18 10:42:53
- * @LastEditTime: 2020-08-05 19:30:38
- * @FilePath: f:\sourcecode\md-vue-loader\src\index.ts
+ * @LastEditTime: 2020-10-16 09:57:27
+ * @FilePath: d:\snake\md-vue-loader\src\index.ts
  */ 
 import MarkdownIt from 'markdown-it';
 import loaderUtils from 'loader-utils';
@@ -21,7 +21,7 @@ const uniqComponentName: string = `Com${uniqid()}Demo`;
 // loader query params
 type QueryOptions = Partial<loaderUtils.OptionObject> | {
     fence: boolean | null | string;
-    componentIndex: boolean | null | string
+    componentIndex: boolean | null | string | number;
 }
 
 const convert: loader.Loader = function(source) {

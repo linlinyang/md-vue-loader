@@ -1,7 +1,4 @@
 import MarkdownIt from 'markdown-it';
-interface UniqComponentName {
-    (): string;
-}
 interface Options {
     containerName?: string;
     demoWrapperClass?: string;
@@ -14,5 +11,5 @@ interface Options {
     beforeCodeSlotName?: string;
     afterCodeSlotName?: string;
 }
-export default function (md: MarkdownIt, { containerName, demoWrapperClass, descClass, highlightClass, beforeDemoSlotName, afterDemoSlotName, beforeDescSlotName, afterDescSlotName, beforeCodeSlotName, afterCodeSlotName }: Options, getName: UniqComponentName): void;
+export default function (md: MarkdownIt, { containerName, demoWrapperClass, descClass, highlightClass, beforeDemoSlotName, afterDemoSlotName, beforeDescSlotName, afterDescSlotName, beforeCodeSlotName, afterCodeSlotName }: Options, getName: () => string): void;
 export {};

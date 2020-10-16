@@ -2,19 +2,14 @@
  * @Author: Yang Lin
  * @Description: config markdownit
  * @Date: 2020-07-12 10:33:37
- * @LastEditTime: 2020-08-01 22:00:47
- * @FilePath: f:\sourcecode\md-vue-loader\src\config.ts
+ * @LastEditTime: 2020-10-16 10:07:17
+ * @FilePath: d:\snake\md-vue-loader\src\config.ts
  */ 
 
 import MarkdownIt from 'markdown-it';
 import container from 'markdown-it-container';
 import Token = require('markdown-it/lib/token');
 import Renderer = require('markdown-it/lib/renderer');
-
-// gen component uniq name
-interface UniqComponentName {
-    (): string
-}
 
 interface EffectiveProperty {
     (prop?: string): string;
@@ -73,7 +68,7 @@ export default function(
         beforeCodeSlotName,
         afterCodeSlotName
     }: Options,
-    getName: UniqComponentName
+    getName: () => string
 ): void {
     const containerReg: RegExp = new RegExp(`^${containerName}[\\s\\S]*?$`,'i');
     
